@@ -11,7 +11,7 @@ video = cv2.VideoCapture('recordo.mkv')
 LAG=7
 WIDTH = 1280
 HEIGHT = 720
-OPTIMISE= 7
+OPTIMISE= 7 
 
 def estimateSpeed(location1, location2,fps):
 	d_pixels = math.sqrt(math.pow(location2[0] - location1[0], 2) + math.pow(location2[1] - location1[1], 2))

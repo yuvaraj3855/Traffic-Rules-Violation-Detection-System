@@ -6,7 +6,7 @@ import math
 import helm
 carCascade = cv2.CascadeClassifier('cars.xml')
 bikeCascade = cv2.CascadeClassifier('motor-v4.xml')
-video = cv2.VideoCapture('recordo.mkv')
+video = cv2.VideoCapture('test.mp4')
 
 LAG=7
 WIDTH = 1280

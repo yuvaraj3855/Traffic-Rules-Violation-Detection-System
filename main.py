@@ -20,9 +20,6 @@ def estimateSpeed(location1, location2,fps):
 	d_meters = d_pixels / ppm
 	if fps == 0.0:
 		fps = 18
-	#fps=18
-	#print("d_pixels=" + str(d_pixels), "d_meters=" + str(d_meters))
-	#fps = 7
 	speed = d_meters * fps * 3.6
 	return speed
 	
@@ -48,7 +45,6 @@ def trackMultipleObjects():
 	snaps = [False for i in range(1000)]
 	types = ["cars" for i in range(1000)]
 	Helmets = ["No Helmet Detected" for i in range(1000)]
-	# Write output to video file
 	out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (WIDTH,HEIGHT))
 	while True:
 		start_time = time.time()
@@ -63,6 +59,7 @@ def trackMultipleObjects():
 		frameCounter = frameCounter + 1
 		
 		carIDtoDelete = []
+
 		for carID in carTracker.keys():
 			trackingQuality = carTracker[carID].update(image)
 			
@@ -86,7 +83,7 @@ def trackMultipleObjects():
 				y = int(_y)
 				w = int(_w)
 				h = int(_h)
-			
+				roi = image[y:y+h,x:x+w]
 				x_bar = x + 0.5 * w
 				y_bar = y + 0.5 * h
 				
@@ -151,9 +148,6 @@ def trackMultipleObjects():
 					carLocation1[currentCarID] = [x, y, w, h]
 					types[currentCarID]= "bikes"
 					currentCarID = currentCarID + 1
-		
-		#cv2.line(resultImage,(0,480),(1280,480),(255,0,0),5)
-
 
 		for carID in carTracker.keys():
 			trackedPosition = carTracker[carID].get_position()
@@ -163,79 +157,44 @@ def trackMultipleObjects():
 			t_w = int(trackedPosition.width())
 			t_h = int(trackedPosition.height())
 			
-			#cv2.rectangle(resultImage, (t_x, t_y), (t_x + t_w, t_y + t_h), rectangleColor, 4)
-			
-			# speed estimation
+			cv2.rectangle(resultImage, (t_x, t_y), (t_x + t_w, t_y + t_h), rectangleColor, 4)
+
 			carLocation2[carID] = [t_x, t_y, t_w, t_h]
 		
 		end_time = time.time()
 		fps=0.0
-		
-		#cv2.putText(resultImage, 'FPS: ' + str(int(fps)), (620, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
-		fm=0
 		for i in carLocation1.keys():	
 			if frameCounter % 1 == 0:
 				[x1, y1, w1, h1] = carLocation1[i]
 				[x2, y2, w2, h2] = carLocation2[i]
-				#print 'previous location: ' + str(carLocation1[i]) + ', current location: ' + str(carLocation2[i])
 				carLocation1[i] = [x2, y2, w2, h2]
-
-				# print 'new previous location: ' + str(carLocation1[i])
 				if [x1, y1, w1, h1] != [x2, y2, w2, h2]:
-					#print("Going")
-					
-				#	if snaps[i] == False:
-						#roi = resultImage[y2:y2+h2,x2:x2+w2]
-				#		if types[i]=="bikes":
-				#			roi = resultImage[y2:y2+h2,x2:x2+w2]
-				#			result = helm.detect(roi)
-				#		snaps[i]=True
-				#		continue
 					result = False
 					roi = resultImage[y1:y1+h1,x1:x1+w1]
 					if types[i]=="bikes" and Helmets[i] == "No Helmet Detected" and identity[i]< OPTIMISE:
 				 		result = helm.detect(roi)
 					if result==True:
 						Helmets[i]= "Helmet Detected"
-
-				#	if y1 >= 275 and y1 <= 285:
 					if 7==7:	
 						if not (end_time == start_time):
 							fps = 1.0/(end_time - start_time)
 						speed[i] = estimateSpeed([x1, y1, w1, h1], [x2, y2, w2, h2],fps)
-						#print(str(speed[i]))
-					#if y1 > 275 and y1 < 285:
 					if int(speed[i])>40:
 						speed[i]= speed[i]%40
 					if go[i] == True and int(speed[i])<10:
 						speed[i]=speed[i]+15
 					if int(speed[i])==0:
 						continue
-					if identity[i]%LAG==0:		
-						if int(speed[i])>30:
-							go[i]=True
-						#if we want to find overspeeding speed just print speed[i]
-
-							cv2.putText(resultImage, "OverSpeeding ALERT", (int(x1 + w1/2), int(y1-5)),cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
-						elif speed[i] != None and y1 >= 180 and speed[i]!=0:
-							ans= str(int(speed[i])) + " km/hr "
-							if types[i]=="bikes":
-								ans= ans+ Helmets[i]
-							cv2.putText(resultImage, ans, (int(x1 + w1/2), int(y1-5)),cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
-					identity[i]+=1
-					#print ('CarID ' + str(i) + ': speed is ' + str("%.2f" % round(speed[i], 0)) + ' km/h.\n')
-
-					#else:
-					#	cv2.putText(resultImage, "Far Object", (int(x1 + w1/2), int(y1)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-			fm+=1		
-
-						#print ('CarID ' + str(i) + ' Location1: ' + str(carLocation1[i]) + ' Location2: ' + str(carLocation2[i]) + ' speed is ' + str("%.2f" % round(speed[i], 0)) + ' km/h.\n')
-		
+					if int(speed[i])>30:
+						go[i]=True
+						cv2.putText(resultImage, "OverSpeeding ALERT", (int(x1 + w1/2), int(y1-5)),cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
+					elif speed[i] != None and y1 >= 180 and speed[i]!=0:
+						ans= str(int(speed[i])) + " km/hr "
+						if types[i]=="bikes":
+							ans= ans+ Helmets[i]
+						cv2.putText(resultImage, ans, (int(x1 + w1/2), int(y1-5)),cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+				identity[i]+=1
 		cv2.imshow('result', resultImage)
-		# Write the frame into the file 'output.avi'
-		# out.write(resultImage)
-		# print(fm)
-
 		if cv2.waitKey(33) == 27:
 			break
 	

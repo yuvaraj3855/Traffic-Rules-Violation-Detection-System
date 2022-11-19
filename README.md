@@ -20,3 +20,5 @@ I have done detection of traffic violations in real time using our owned trained
 
 * Run python main.py
 
+# Our Results
+ To see, the results. open **Result** 

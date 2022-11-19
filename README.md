@@ -22,3 +22,4 @@ I have done detection of traffic violations in real time using our owned trained
 
 # Our Results
  To see, the results. open **Result** 
+![DEMO](https://github.com/yuvaraj3855/Traffic-Rules-Violation-Detection-System/blob/762d1f5297379a4c6df4337161eaa9464da13f33/Result/Screenshot%20from%202022-11-19%2021-37-29.png)
